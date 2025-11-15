@@ -14,7 +14,7 @@ Chat/comment with lecturer inside the issue thread
 
 2. Lecturer Features
 
-View issues from students enrolled in their units
+View issues from students 
 
 Update issue status: Pending → Reviewing → Resolved
 

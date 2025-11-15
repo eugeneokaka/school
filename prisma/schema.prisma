@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+// ======================================================
+// USERS (Students - authenticated by Clerk)
+// ======================================================
+// ======================================================
+// USERS (Students - authenticated by Clerk)
+// ======================================================
+model User {
+  id        String   @id @default(uuid())
+  clerkId   String   @unique
+  firstName String
+  lastName  String
+  email     String   @unique
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+
+  issues   Issue[]   @relation("UserIssues")
+  comments Comment[] @relation("UserComments")
+
+  publicIssues PublicIssue[]  @relation("UserPublicIssues")
+  publicComments PublicComment[] @relation("UserPublicComments")
+}
+
+model Staff {
+  id         String   @id @default(uuid())
+  clerkId    String   @unique
+  firstName  String
+  lastName   String
+  email      String   @unique
+  department String
+  role       String   @default("user")
+  createdAt  DateTime @default(now())
+
+  assignedIssues Issue[]    @relation("StaffIssues")
+  comments        Comment[] @relation("StaffComments")
+}
+
+model Issue {
+  id          String      @id @default(uuid())
+  title       String
+  description String
+  issueType   String?
+  department  String
+  status      IssueStatus @default(pending)
+  createdAt   DateTime    @default(now())
+
+  attachments String[]
+
+  studentId String
+  staffId   String?
+
+  student User  @relation("UserIssues", fields: [studentId], references: [id], onDelete: Cascade)
+  staff   Staff? @relation("StaffIssues", fields: [staffId], references: [id], onDelete: Cascade)
+
+  comments Comment[]
+}
+enum IssueStatus {
+
+  pending
+  reviewing
+  resolved
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  message   String
+  createdAt DateTime @default(now())
+
+  issueId String
+  userId  String?
+  staffId String?
+
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  user  User?  @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade)
+  staff Staff? @relation("StaffComments", fields: [staffId], references: [id], onDelete: Cascade)
+}
+
+
+// Public Issues
+
+model PublicIssue {
+  id          String      @id @default(uuid())
+  title       String
+  content     String
+  issuetype        String
+  attachments String[]
+  isAnonymous Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+
+  userId String?
+  user   User? @relation("UserPublicIssues", fields: [userId], references: [id], onDelete: Cascade)
+
+  comments PublicComment[]
+}
+
+model PublicComment {
+  id        String   @id @default(uuid())
+  message   String
+  createdAt DateTime @default(now())
+
+  issueId String
+  userId  String?
+
+  issue PublicIssue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  user  User?       @relation("UserPublicComments", fields: [userId], references: [id], onDelete: Cascade)
+
+  parentId String?
+  parent   PublicComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  PublicComment[] @relation("CommentReplies")
+}

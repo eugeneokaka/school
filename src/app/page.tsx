@@ -1,65 +1,136 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+type PublicIssue = {
+  id: string;
+  title: string;
+  content: string;
+  issuetype: string;
+  createdAt: string;
+  isAnonymous: boolean;
+  user?: {
+    firstName: string;
+    lastName: string;
+  };
+};
+
+export default function HomePage() {
+  const [issues, setIssues] = useState<PublicIssue[]>([]);
+
+  useEffect(() => {
+    async function fetchIssues() {
+      const res = await fetch("/api/public-issues");
+      const data = await res.json();
+      setIssues(data.announcements || []);
+    }
+    fetchIssues();
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen w-full bg-gray-100 text-gray-900">
+      {/* HERO SECTION */}
+      <section className="min-h-[60vh] flex items-center justify-center px-6 bg-white border-b border-gray-200">
+        <div className="max-w-2xl text-center space-y-6">
+          <h1 className="text-5xl font-extrabold tracking-tight text-gray-900">
+            Welcome to Kabarak Online Helpdesk
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="text-lg text-gray-600">
+            Access announcements, report issues, and manage staff services all
+            in one place.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* CARDS SECTION */}
+      <section className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 px-6 py-16">
+        <Card className="rounded-2xl border border-gray-300 bg-white shadow-sm hover:shadow-md transition">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              Staff Directory
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <p className="text-gray-600 mb-3 leading-relaxed">
+              Contact staff members for assistance and support.
+            </p>
+            <a
+              href="/issues"
+              className="text-black font-medium hover:underline mt-2 inline-block"
+            >
+              Open Issues
+            </a>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border border-gray-300 bg-white shadow-sm hover:shadow-md transition">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              Submit an Issue
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <p className="text-gray-600 mb-3 leading-relaxed">
+              Report public issues, concerns, or make announcements.
+            </p>
+            <a
+              href="/new"
+              className="text-black font-medium hover:underline mt-2 inline-block"
+            >
+              Create Issue
+            </a>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* LATEST PUBLIC ISSUES */}
+      <section className="max-w-5xl mx-auto px-6 pb-20 space-y-6">
+        <h2 className="text-3xl font-semibold text-gray-900">
+          Latest Public Issues
+        </h2>
+
+        <div className="space-y-4">
+          {issues.length === 0 && (
+            <p className="text-gray-600">No public issues available.</p>
+          )}
+
+          {issues.map((issue) => (
+            <Card
+              key={issue.id}
+              className="rounded-xl border border-gray-300 bg-white shadow-sm hover:shadow-md transition p-4"
+            >
+              {/* HEADER */}
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl font-semibold text-gray-900">
+                  {issue.title}
+                </CardTitle>
+
+                <div className="text-sm text-gray-500 flex gap-4 mt-1">
+                  <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
+                  <span>
+                    {issue.isAnonymous
+                      ? "Posted Anonymously"
+                      : issue.user
+                      ? `Posted by ${issue.user.firstName} ${issue.user.lastName}`
+                      : "Posted by Unknown"}
+                  </span>
+                </div>
+              </CardHeader>
+
+              {/* FULL CONTENT */}
+              <CardContent>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {issue.content}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </main>
+      </section>
     </div>
   );
 }
