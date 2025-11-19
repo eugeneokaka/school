@@ -25,6 +25,32 @@ datasource db {
 // ======================================================
 // USERS (Students - authenticated by Clerk)
 // ======================================================
+model Project {
+  id                 String     @id @default(uuid())
+  studentId          String
+  firstName          String
+  lastName           String
+  registrationNumber String
+  fileUrl            String
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  student            User       @relation(fields: [studentId], references: [id])
+  feedbacks          Feedback[]
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String?    // either student or lecturer
+  message   String
+  sender    String      // “student” or “lecturer”
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id])
+}
+
 model User {
   id        String   @id @default(uuid())
   clerkId   String   @unique
@@ -34,11 +60,13 @@ model User {
   role      String   @default("user")
   createdAt DateTime @default(now())
 
-  issues   Issue[]   @relation("UserIssues")
-  comments Comment[] @relation("UserComments")
+  issues          Issue[]         @relation("UserIssues")
+  comments        Comment[]       @relation("UserComments")
+  publicIssues    PublicIssue[]   @relation("UserPublicIssues")
+  publicComments  PublicComment[] @relation("UserPublicComments")
 
-  publicIssues PublicIssue[]  @relation("UserPublicIssues")
-  publicComments PublicComment[] @relation("UserPublicComments")
+  projects        Project[]
+  feedbacks       Feedback[]
 }
 
 model Staff {

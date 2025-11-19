@@ -155,6 +155,7 @@ export default function DashboardPage() {
             <option value="academics">academics</option>
             <option value="sset">sset</option>
             <option value="medicine">medicine</option>
+            <option value="administration">administration</option>
             {/* <option value="Security">administration</option> */}
           </select>
 

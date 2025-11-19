@@ -20,10 +20,10 @@ export default function Navbar() {
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-6">
           <Link
-            href="/dashboard"
+            href="/project"
             className="text-brown-800 hover:text-[#4b2e2e] font-medium transition"
           >
-            Dashboard
+            projects
           </Link>
 
           {/* Signed Out → Show Login */}
