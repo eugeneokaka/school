@@ -19,12 +19,13 @@ type ProjectType = {
   registrationNumber: string;
   fileUrl: string;
   feedbacks: FeedbackType[];
+  projecturl?: string;
 };
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectType[]>([]);
   const [feedbacks, setFeedbacks] = useState<{ [key: string]: string }>({});
-  const [loading, setLoading] = useState(true); // <-- added
+  const [loading, setLoading] = useState(true);
 
   const fetchProjects = async () => {
     try {
@@ -35,7 +36,7 @@ export default function ProjectsPage() {
       console.error(error);
       toast.error("Failed to fetch projects");
     } finally {
-      setLoading(false); // <-- added
+      setLoading(false);
     }
   };
 
@@ -64,13 +65,13 @@ export default function ProjectsPage() {
       }
       toast.success("Feedback sent!");
       setFeedbacks({ ...feedbacks, [projectId]: "" });
-      fetchProjects(); // refresh
+      fetchProjects();
     } catch (error) {
       toast.error("Error sending feedback");
     }
   };
 
-  // ---------- LOADING SCREEN ----------
+  // ---------- LOADING ----------
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -78,7 +79,6 @@ export default function ProjectsPage() {
       </div>
     );
   }
-  // ------------------------------------
 
   return (
     <div className="max-w-4xl mx-auto mt-10 space-y-8">
@@ -90,6 +90,8 @@ export default function ProjectsPage() {
             {project.firstName} {project.lastName} ({project.registrationNumber}
             )
           </h2>
+
+          {/* Document Link */}
           <a
             href={project.fileUrl}
             target="_blank"
@@ -98,8 +100,23 @@ export default function ProjectsPage() {
             View Document
           </a>
 
+          {/* ✅ Project URL */}
+          {project.projecturl && (
+            <p>
+              <strong>Project URL:</strong>{" "}
+              <a
+                href={project.projecturl}
+                target="_blank"
+                className="text-blue-600 underline"
+              >
+                {project.projecturl}
+              </a>
+            </p>
+          )}
+
           <div className="space-y-2">
             <h3 className="font-medium">Feedback:</h3>
+
             {project.feedbacks.map((f) => (
               <p key={f.id}>
                 <strong>

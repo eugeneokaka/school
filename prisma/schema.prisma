@@ -7,9 +7,8 @@
 generator client {
   // provider = "prisma-client"
   // output   = "../src/generated/prisma"
-   provider = "prisma-client-js"
+  provider = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
-
 }
 
 datasource db {
@@ -17,38 +16,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 // ======================================================
 // USERS (Students - authenticated by Clerk)
 // ======================================================
-// ======================================================
-// USERS (Students - authenticated by Clerk)
-// ======================================================
+
 model Project {
   id                 String     @id @default(uuid())
   studentId          String
   firstName          String
   lastName           String
   registrationNumber String
+  projecturl         String?
   fileUrl            String
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
 
-  student            User       @relation(fields: [studentId], references: [id])
-  feedbacks          Feedback[]
+  student   User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feedbacks Feedback[]
 }
 
 model Feedback {
   id        String   @id @default(uuid())
   projectId String
-  userId    String?    // either student or lecturer
+  userId    String? // either student or lecturer
   message   String
-  sender    String      // “student” or “lecturer”
+  sender    String   // “student” or “lecturer”
   createdAt DateTime @default(now())
 
-  project   Project  @relation(fields: [projectId], references: [id])
-  user      User?     @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -65,8 +61,8 @@ model User {
   publicIssues    PublicIssue[]   @relation("UserPublicIssues")
   publicComments  PublicComment[] @relation("UserPublicComments")
 
-  projects        Project[]
-  feedbacks       Feedback[]
+  projects  Project[]
+  feedbacks Feedback[]
 }
 
 model Staff {
@@ -79,8 +75,8 @@ model Staff {
   role       String   @default("user")
   createdAt  DateTime @default(now())
 
-  assignedIssues Issue[]    @relation("StaffIssues")
-  comments        Comment[] @relation("StaffComments")
+  assignedIssues Issue[]  @relation("StaffIssues")
+  comments       Comment[] @relation("StaffComments")
 }
 
 model Issue {
@@ -102,8 +98,8 @@ model Issue {
 
   comments Comment[]
 }
-enum IssueStatus {
 
+enum IssueStatus {
   pending
   reviewing
   resolved
@@ -123,17 +119,16 @@ model Comment {
   staff Staff? @relation("StaffComments", fields: [staffId], references: [id], onDelete: Cascade)
 }
 
-
 // Public Issues
 
 model PublicIssue {
-  id          String      @id @default(uuid())
+  id          String     @id @default(uuid())
   title       String
   content     String
-  issuetype        String
+  issuetype   String
   attachments String[]
-  isAnonymous Boolean       @default(false)
-  createdAt   DateTime      @default(now())
+  isAnonymous Boolean    @default(false)
+  createdAt   DateTime   @default(now())
 
   userId String?
   user   User? @relation("UserPublicIssues", fields: [userId], references: [id], onDelete: Cascade)
@@ -153,6 +148,6 @@ model PublicComment {
   user  User?       @relation("UserPublicComments", fields: [userId], references: [id], onDelete: Cascade)
 
   parentId String?
-  parent   PublicComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies  PublicComment[] @relation("CommentReplies")
+  parent   PublicComment?   @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  PublicComment[]  @relation("CommentReplies")
 }

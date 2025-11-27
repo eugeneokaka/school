@@ -80,6 +80,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log(body);
+    const existingStaff = await prisma.staff.findUnique({ where: { clerkId } });
+    console.log("existing staff:", existingStaff);
+    if (existingStaff) {
+      return NextResponse.json(
+        { error: "Staff with this Clerk ID already exists" },
+        { status: 400 }
+      );
+    }
+
     // Create staff
     const staff = await prisma.staff.create({
       data: {
@@ -93,9 +103,11 @@ export async function POST(req: NextRequest) {
     });
 
     // Remove from User table AFTER becoming staff
+    console.log("Deleting user with clerkId:", clerkId);
     await prisma.user.delete({
-      where: { clerkId },
+      where: { email },
     });
+    console.log("Deleted user with clerkId:", clerkId);
 
     return NextResponse.json({ success: true, staff });
   } catch (err: any) {

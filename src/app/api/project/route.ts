@@ -10,7 +10,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { firstName, lastName, registrationNumber, fileUrl } = body;
+    const { firstName, lastName, registrationNumber, fileUrl, projecturl } =
+      body;
 
     if (!firstName || !lastName || !registrationNumber || !fileUrl) {
       return NextResponse.json(
@@ -34,6 +35,7 @@ export async function POST(req: Request) {
         lastName,
         registrationNumber,
         fileUrl,
+        projecturl,
       },
     });
 

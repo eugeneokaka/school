@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { FileUpload } from "@/app/components/uploadthing"; // ✅ FIXED IMPORT
+import { FileUpload } from "@/app/components/uploadthing";
 import { useRouter } from "next/navigation";
 
 export default function SubmitProjectPage() {
@@ -15,6 +15,7 @@ export default function SubmitProjectPage() {
     firstName: "",
     lastName: "",
     registrationNumber: "",
+    projecturl: "", // ✅ NEW FIELD
   });
 
   const handleChange = (e: any) => {
@@ -75,6 +76,19 @@ export default function SubmitProjectPage() {
           onChange={handleChange}
         />
       </div>
+
+      {/* ✅ NEW PROJECT URL FIELD */}
+      <div>
+        <label>Project URL (GitHub / Live Link)</label>
+        <Input
+          name="projecturl"
+          value={form.projecturl}
+          onChange={handleChange}
+          placeholder="https://github.com/username/project"
+        />
+      </div>
+
+      <p>first convert to pdf before upload</p>
 
       <div className="border p-3 rounded-md">
         <FileUpload
